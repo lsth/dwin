@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+if [[ $# != 1 ]]; then
+    echo "usage: _emacs-key <key>"
+    echo "  send <key> as user input to emacs."
+    echo '  example: _emacs-key "C-<f11>"'
+    exit 0
+fi
+key="$1"
+emacsclient -e "(dwin-input-key \"$key\")"

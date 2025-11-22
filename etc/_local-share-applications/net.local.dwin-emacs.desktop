@@ -1,0 +1,7 @@
+[Desktop Entry]
+Exec=dwin-emacs
+Name=start/activate/switch-buffer emacs
+NoDisplay=true
+StartupNotify=false
+Type=Application
+X-KDE-GlobalAccel-CommandShortcut=true

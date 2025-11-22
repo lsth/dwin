@@ -1,0 +1,4 @@
+*.elc
+/unused/
+etc/dev-emacs-init/eln-cache
+/etc/dev-emacs-init/elpa/

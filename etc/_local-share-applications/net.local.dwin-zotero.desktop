@@ -1,0 +1,7 @@
+[Desktop Entry]
+Exec=dwin-zotero
+Name=start/activate/toggle firefox
+NoDisplay=true
+StartupNotify=false
+Type=Application
+X-KDE-GlobalAccel-CommandShortcut=true

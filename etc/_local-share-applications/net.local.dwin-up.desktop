@@ -1,0 +1,7 @@
+[Desktop Entry]
+Exec=dwin-up
+Name=switch to up window (kwin or emacs)
+NoDisplay=true
+StartupNotify=false
+Type=Application
+X-KDE-GlobalAccel-CommandShortcut=true

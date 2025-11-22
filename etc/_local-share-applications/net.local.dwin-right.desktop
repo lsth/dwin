@@ -1,0 +1,7 @@
+[Desktop Entry]
+Exec=dwin-right
+Name=switch to right window (kwin or emacs)
+NoDisplay=true
+StartupNotify=false
+Type=Application
+X-KDE-GlobalAccel-CommandShortcut=true
