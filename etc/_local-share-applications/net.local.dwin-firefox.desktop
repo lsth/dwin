@@ -5,3 +5,5 @@ NoDisplay=true
 StartupNotify=false
 Type=Application
 X-KDE-GlobalAccel-CommandShortcut=true
+X-License=GPL-3.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later

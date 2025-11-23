@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
 if [[ $# != 1 ]]; then
     echo "usage: _emacs-key <key>"
     echo "  send <key> as user input to emacs."

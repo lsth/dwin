@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
 _emacs-key "M-<down>"

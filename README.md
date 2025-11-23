@@ -63,7 +63,7 @@ In your `init.el` (see [example](etc/example-emacs-init/init.el)):
 	- `Alt-right` to `etc/bin/dwin-right`, 
 	- `Alt-up` to `etc/bin/dwin-up`, and 
 	- `Alt-down` to `etc/bin/dwin-down`.
-	
+    	
     (alternatively, you can 
     - copy the contents of [etc/_config/kglobalshortcutsrc](etc/_config/kglobalshortcutsrc) at the end
       of your `~/.config/kglobalshortcutsrc` and
@@ -71,8 +71,11 @@ In your `init.el` (see [example](etc/example-emacs-init/init.el)):
       `~/.local/share/applications` and then
     - ask kwin to reload its config: `qdbus6 org.kde.KWin /KWin reconfigure`.)
 
-	Then with `M-<left>/<right>/<up>/<down>` you can move between Emacs windows and between
-	desktop windows seamlessly.
+    Also ensure that [_emacs-key](etc/bin/_emacs-key) is on your PATH, e.g.,
+	by copying it to `~/bin` or `~/.local/bin` (if in your PATH).
+
+	Then with `M-<left>/<right>/<up>/<down>` you can move between Emacs
+	windows and between	desktop windows seamlessly.
 
 4. For basic 🏷️ **named navigation**, add to `use-package`:
    ```emacs-lisp

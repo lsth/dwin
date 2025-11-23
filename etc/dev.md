@@ -28,3 +28,12 @@ to preview, in project directory:
     go-grip -p 8100 README.md
 ```
 
+## 3. releases and versions
+1. update `dwin.el`  header 
+   and create a commit "bump version to 0.1"
+   (as a stand-alone commit)
+2. create a git tag:
+```
+git tag -a v0.1 -m "Release version 0.1"
+git push origin main --tags
+```
