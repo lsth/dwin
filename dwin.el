@@ -21,22 +21,22 @@
 ;; the window manager forwards some keys globally to Emacs;
 ;; for KDE one can bind a one-line script that uses Emacsclient
 ;; to forward the key to Emacs, using `dwin-input-key' defined in
-;; sect. 1. See etc/bin/dwin-firefox for an example. See
+;; sect.  1. See etc/bin/dwin-firefox for an example.  See
 ;; Further Details / 1 for why we do not use tools like qdotool for
 ;; sending keys.
 ;;
 ;; Emacs then can use functions provided by the window manager
-;; to implement window navigation globally. We captured all required
+;; to implement window navigation globally.  We captured all required
 ;; methods in a window manager proxy object `dwin-proxy' whose
-;; methods can be called via `dwin-call'. The proxy has to be created
+;; methods can be called via `dwin-call'.  The proxy has to be created
 ;; once before use, e.g., during Emacs initialization, using
-;; `dwin-setup'. Currently only a proxy for KDE is implemented.
+;; `dwin-setup'.  Currently only a proxy for KDE is implemented.
 ;; But it should be possible to implement further ones.
 ;; The KDE proxy uses
 ;; i) dbus calls to org.kde.kglobalaccel (KDE's shortcuts
-;;    application), esp. for directional navigation, and
+;;    application), esp.  for directional navigation, and
 ;; ii) kdotool for navigation by name.
-;; See sect. 2 below.
+;; See sect.  2 below.
 ;;
 ;; 🏷️ Navigation by name is provided by `dwin-switch-to-app' that will
 ;; i) start an app, if it has no window yet,
@@ -52,18 +52,18 @@
 ;; Switching back to Emacs is handled by `dwin-switch-to-emacs-or'.
 ;; It needs the same handling as the other apps above.
 ;; By default, navigation by name will switch to the first window of
-;; an application, if it has several. You can use a prefix arg to
+;; an application, if it has several.  You can use a prefix arg to
 ;; switch to a specific one, e.g., C-2 M-x my/firefox or C-2 <f11> to
-;; switch to the second one. See sect. 3 below.
+;; switch to the second one.  See sect.  3 below.
 ;;
 ;; For 🔀 directional navigation, we defined a short function
-;; `dwin-windmove-left' for each direction. The function tries to
+;; `dwin-windmove-left' for each direction.  The function tries to
 ;; move inside Emacs via windmove, and if this fails, uses the
 ;; window manager to move out of Emacs.
 ;; The same method also uses the window manager to move
-;; directional from desktop windows. See sect. 4.
+;; directional from desktop windows.  See sect.  4.
 ;;
-;; Sect. 5 contains function `dwin-grab' to ⧉ arrange desktop
+;; Sect.  5 contains function `dwin-grab' to ⧉ arrange desktop
 ;; windows, i.e., to resize them, reposition them etc.
 ;;
 ;; See etc/example-emacs-init/init.el for an example configuration.
@@ -71,17 +71,17 @@
 ;; Known Issues and Limitations:
 ;; 1. Requesting help for a **global** key binding with `describe key'
 ;;    will not work.  Emacs will get the key forwarded, but not as
-;;    input for the already running describe-key function. In effect,
+;;    input for the already running describe-key function.  In effect,
 ;;    if you say M-x describe-key and then type a global key like
 ;;    M-left, its action is executed and help for the **next** key the
-;;    user types is shown. To view the help, you have to know how the
+;;    user types is shown.  To view the help, you have to know how the
 ;;    key is called in Emacs and say M-: (describe-key (kbd
 ;;    "M-<left>")) instead.  One could instrument `dwin-input-key' to
 ;;    detect if describe-key is running by checking
 ;;    (describe-key (kbd "M-<left>")) and then run describe-key with
-;;    the key instead of the command the key is bound to. However, I
+;;    the key instead of the command the key is bound to.  However, I
 ;;    found no way to cancel the already running describe-key
-;;    command. So the second issue will persist.
+;;    command.  So the second issue will persist.
 ;;
 ;; Further details:
 ;; 1. Why cannot we just use ydotool to send keys to Emacs?
@@ -89,7 +89,7 @@
 ;;    the active/focused window and would be able only to implement
 ;;    the cases where one wants to move from within Emacs, not the
 ;;    cases where one wants to move back to Emacs from other
-;;    applications (or between other applications). One could
+;;    applications (or between other applications).  One could
 ;;    reimplement dwin in bash, then there is no need to input keys
 ;;    into Emacs anymore.
 ;; 
@@ -116,8 +116,7 @@ package."
   :prefix "dwin-")      ;; optional: used for variables/functions
 
 (defcustom dwin-switch-to-emacs-function 'switch-to-buffer
-  "Function to call in `dwin-switch-to-emacs-or' when we are already
-in Emacs."
+  "Function `dwin-switch-to-emacs-or' will call when already in Emacs."
   :type 'function
   :group 'dwin)
 
@@ -148,8 +147,7 @@ in Emacs."
 
 
 (defun dwin-message (format &rest args)
-  "Send a `message' with FORMAT and ARGS, unless `dwin-be-quiet' is
-true."
+  "Send a `message' with FORMAT and ARGS, unless `dwin-be-quiet' is true."
   (unless dwin-be-quiet
     (apply #'message format args)))
 
@@ -214,8 +212,7 @@ otherwise returns \"unknown\"."
    (t "unknown")))
 
 (defun dwin-setup--kwin ()
-  "Return a KWin proxy object with directional window-switching
-methods."
+  "Return a KWin proxy object with directional window-switching methods."
   (let ((self nil))  ;; forward reference for self
     (setq self
           `(;; private methods:
@@ -349,8 +346,8 @@ The object is stored in `dwin-proxy'."
 	   (message "no proxy for window manager '%s'." wm) )))))
 
 (defun dwin-call (obj method &rest args)
-  "Call METHOD (a symbol) on OBJ (an alist object),
-passing ARGS to the method function."
+  "Call METHOD (a symbol) on OBJ (an alist object).
+ARGS are passed as arguments to the method function."
   (let ((fn (cdr (assoc method obj))))
     (if fn
         (apply fn args)
@@ -369,16 +366,16 @@ If RELATIVE is t, switch relative to the current desktop."
 
 ;;_ 3. navigation by name
 (defvar dwin-process-per-app (make-hash-table :test 'equal)
-  "Keep track of the process of an app we started (vs. processes
-started outside Emacs). Used by `dwin-switch-to-app'.")
+  "Keep track of processes of apps started from within Emacs.
+This deliberately does not cover processes started outside Emacs.
+ Used by `dwin-switch-to-app'.")
 
 (defvar dwin-last-window-per-app (make-hash-table :test 'equal)
-  "Keep track of the window the user has explicitly selected last
-time. Used by `dwin-switch-to-app'.")
+  "Keep track of the window the user has explicitly selected last time.
+Used by `dwin-switch-to-app'.")
 
 (defun dwin-reset-window-memory ()
-  "Reset windows remembered for last app started and last window
-requested."
+  "Reset windows remembered for last app started and last window requested."
   (setq dwin-process-per-app (make-hash-table :test 'equal))
   (setq dwin-last-window-per-app (make-hash-table :test 'equal)))
 
@@ -407,8 +404,8 @@ Can be used in messages."
                              map))))
 
 (defun dwin-message-with-link (link &rest args)
-  "Message the user. Add (propertized) LINK in the *messages* buffer
-at the end. ARGS contain the message format and arguments."
+  "Message the user, including a (propertized) LINK in the *messages* buffer.
+ARGS contain the message format and arguments."
   (apply #'message args)
   (with-current-buffer "*Messages*"
     (let ((inhibit-read-only t))
@@ -442,8 +439,7 @@ Keeps track of the last application launched in
       proc)))
 
 (defun dwin-window-app (name)
-  "Return the window of the app NAME started last by us via
-`dwin-run'."
+  "Return the window of the app NAME started last by us via `dwin-run'."
   (let* ((proc (gethash name dwin-process-per-app nil))
 	 (pid (when (process-live-p proc)
 		(process-id proc)))
@@ -454,15 +450,13 @@ Keeps track of the last application launched in
     win))
 
 (defun dwin-expand-tilde-only (path)
-  "Expand a leading ~ in PATH, but leave the rest of the path
-relative."
+  "Expand a leading ~ in PATH, but leave the rest of the path relative."
   (if (string-match-p "^~" path)
       (concat (getenv "HOME") (substring path 1))
     path))
 
 (defun dwin-normalize-shell-command (cmd)
-  "Normalize a shell command CMD, expanding all ~ to the home
-directory.
+  "Normalize a shell command CMD, expanding all ~ to the home directory.
 Only the normalized command we then can find with pgrep."
   (let* ((cmd-parts (split-string-and-unquote cmd))
 	 (cmd-parts-norm (mapcar #'dwin-expand-tilde-only cmd-parts))
@@ -632,8 +626,7 @@ Returns a pair/cons (NAME . ID)."
 
 ;;;###autoload
 (defun dwin-grab (&optional window)
-  "Let the user grab and arrange WINDOW interactively, e.g., move,
-resize etc."
+  "Let the user grab and arrange WINDOW interactively, e.g., move, resize etc."
   (interactive
    (list
     (dwin-read-window "window to act on: ")))

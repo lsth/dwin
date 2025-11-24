@@ -17,6 +17,12 @@ to check manually before, say in the project directory:
 	pre-commit run --all-files
 ```
 
+for further checks, you can say in `etc/`
+```bash
+	make check-melpazoid
+```
+(if [melpazoid](https://github.com/riscy/melpazoid) has been installed in `~/local/system/misc/melpazoid`).
+
 ## 2. markdown preview
 install once:
 ```bash

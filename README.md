@@ -95,20 +95,20 @@ In your `init.el` (see [example](etc/example-emacs-init/init.el)):
 | Key         | Action                                        |
 |-------------|-----------------------------------------------|
 | `a`         | activate window                               |
-| `c`         | close window                                  |
-| `M`         | minimize window (there is no maximize window) |
 | `r`         | raise window                                  |
-| `left`      | move to window left                           |
-| `right`     | move to window right                          |
-| `up`        | move to window up                             |
-| `down`      | move to window down                           |
+| `M`         | minimize window (there is no maximize window) |
+| `c`         | close window                                  |
+| `left`      | move window left                              |
+| `right`     | move window right                             |
+| `up`        | move window up                                |
+| `down`      | move window down                              |
+| `D<number>` | move window to desktop                        |
 | `+`         | resize window horizontally (increase)         |
 | `-`         | resize window horizontally (decrease)         |
 | `M-+`       | resize window vertically (increase)           |
 | `M--`       | resize window vertically (decrease)           |
 | `W`         | pick another window to arrange                |
 | `.`         | pick the Emacs window to arrange              |
-| `D<number>` | move window to desktop                        |
 | `q`         | quit                                          |
 
 2. For **toggling** 🏷️ **named navigation** with a single key, add to `use-package`:
