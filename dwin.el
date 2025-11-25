@@ -140,8 +140,10 @@
   :type 'integer
   :group 'dwin)
 
-(defcustom dwin-be-quiet nil
-  "Set to t, if dwin should send fewer messages to the user."
+(defcustom dwin-kwin-use-shortcuts t
+  "If the KDE/KWin proxy should use KWin shortcuts.
+If nil, implements the behavior in elisp.
+To take effect, the proxy has to be reset via `dwin-setup'."
   :type 'boolean
   :group 'dwin)
 
@@ -239,7 +241,7 @@ If A, B, and STEP are given, return integers from A to B-1 in steps of STEP."
     (cl-loop for i from start below end by step
              collect i)))
 
-(defun dwin-argmin (lst pred)
+(defun dwin-argmin-index (lst pred)
   "Find the index of the element in LST for which PRED returns the smallest value."
   (cl-loop with best-idx = 0
 	   with best-val = (funcall pred (nth 0 lst))
@@ -250,6 +252,17 @@ If A, B, and STEP are given, return integers from A to B-1 in steps of STEP."
 	   do (setq best-idx i
 		    best-val val)
 	   finally return best-idx))
+
+(defun dwin-argmin (lst pred)
+  "Find the element in LST for which PRED returns the smallest value."
+  (cl-loop with best-elem = (nth 0 lst)
+	   with best-val = (funcall pred (nth 0 lst))
+	   for x in (cdr lst)
+           for val = (funcall pred x)
+           when (< val best-val)
+	   do (setq best-elem x
+		    best-val val)
+	   finally return best-elem))
 
 (defun dwin-argmax (lst pred)
   "Find the index of the element in LST for which PRED returns the largest value."
@@ -304,6 +317,7 @@ DIRECTION can be \='left, \='right, \='up or \='down.
 If WINDOW is missing, the active window is taken as starting point.
 PROXY is the window manager proxy.
 TODO: break ties."
+  (dwin-message 2 "next window in direction %s" direction)
   (let* ((win-start (or window (dwin-call proxy 'getactivewindow)))
 	 (desktop (dwin-call proxy 'get_desktop_for_window win-start))
 	 (wins (remove win-start
@@ -323,6 +337,11 @@ TODO: break ties."
 		       (`down  (lambda (idx) (nth 1 (nth idx geoms))))))
 	 (indices-qual (dwin-collect (dwin-range (length wins)) pred-filter))
 	 (index-best   (when indices-qual (dwin-argmin indices-qual pred-score))) )
+    (dwin-message 2 "geom-start: %s" geom-start)
+    (dwin-message 2 "geoms: %s" geoms)
+    (dwin-message 2 "indices-qual: %s" indices-qual)
+    (dwin-message 2 "index-best: %s" index-best)
+
     (when index-best (nth index-best wins))))
 
 (defun dwin--switch-direction (proxy direction)
@@ -528,6 +547,18 @@ Filters using `search-filter'."
 	  ;; overwrite attributes (new values)
 	  (cons '_class "proxy-kwin")
 	  (cons 'dotool-name "kdotool")
+	  ;; public methods:
+	  ;; "kdotool search --pid <pid>" throws odd error "Error: missing argument for option '--pid'"
+	  ;; search for two properties (--all) with an empty condition ("") for the 2nd one works.
+          (cons 'search-pid (lambda (pid) (dwin-call self 'dotool
+						     "search" "--all"
+						     "--pid" (format "%s" pid)
+						     "")))
+	  (cons 'short-windowid (lambda (id)
+				  (substring id 1 5))) ))
+    (when dwin-kwin-use-shortcuts
+      (dwin-extend self
+	 (list
 	  ;; private methods:
 	  (cons 'invoke-shortcut (lambda (name)
 				   (dwin-message 2 "invoke-shortcut: %s" name)
@@ -543,12 +574,6 @@ Filters using `search-filter'."
 					     "KWin D-Bus error: %s"
 					     err)))))
 	  ;; public methods:
-	  ;; "kdotool search --pid <pid>" throws odd error "Error: missing argument for option '--pid'"
-	  ;; search for two properties (--all) with an empty condition ("") for the 2nd one works.
-          (cons 'search-pid (lambda (pid) (dwin-call self 'dotool
-						     "search" "--all"
-						     "--pid" (format "%s" pid)
-						     "")))
 	  (cons 'switch-left  (lambda () (dwin-call self
 						    'invoke-shortcut
 						    "Switch Window Left")))
@@ -560,9 +585,7 @@ Filters using `search-filter'."
 						    "Switch Window Up")))
 	  (cons 'switch-down  (lambda () (dwin-call self
 						    'invoke-shortcut
-						    "Switch Window Down")))
-	  (cons 'short-windowid (lambda (id)
-				  (substring id 1 5))) ))
+						    "Switch Window Down"))) )))
 	 self))
 
 ;;_ 4.4 setting up the wm proxy
