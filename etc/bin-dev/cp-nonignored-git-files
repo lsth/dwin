@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# - copy-nonignored-git-files
+
+if [ $# -ne 2 ]; then
+    echo "usage: copy-nonignored-git-files <source_dir> <target_dir>"
+     echo "   copy all files from <source_dir> to <target_dir>"
+    echo "   that are not ignored by git."
+    exit -1
+fi
+
+src="$1"
+dst="$2"
+
+mkdir -p "$dst"
+
+# Copy tracked + untracked but not ignored files
+git -C "$src" ls-files --others --cached --exclude-standard -z | \
+while IFS= read -r -d '' file; do
+    mkdir -p "$dst/$(dirname "$file")"
+    cp "$src/$file" "$dst/$file"
+done

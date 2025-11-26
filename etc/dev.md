@@ -43,3 +43,22 @@ to preview, in project directory:
 git tag -a v0.1 -m "Release version 0.1"
 git push origin main --tags
 ```
+
+## 4. testing compatibility with older emacs
+To test the current development working copy, we use straight and
+substitute the dwin repo with a symlink to the project working copy.
+
+1. current emacs: just the everyday one used to develop the package.
+2. emacs-30.2, ..., 29.1
+   ```
+   TEST_EMACS=rare-emacs-29.4 make test
+   ```
+3. emacs-28.2, 28.1:
+    - no `--init-directory`
+	- no `use-package` built in.
+	- two functions missing: handled in a different init.el (04-dwin-via-straight-emacs-before-29.1)
+  ```
+  TEST_EMACS28=rare-emacs-28.1 make test-emacs28
+  # menu: lisp / evaluate-buffer
+  ```
+  

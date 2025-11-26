@@ -36,10 +36,14 @@ compositors.
 	   <br/>--- otherwise install via your Linux package manager,
 	- for X11 window managers, [xdotool](https://github.com/jordansissel/xdotool) is installed,
 	  <br/>--- can be installed with your package manager,
+	- for KDE/KWin, kdotool is installed,
+	  <br/> --- see [issue 4](#limit:kdotool) below about how to do this currently. 
+<!--	   <br/>--- can be installed via `cargo install kdotool`, 
 	- for KDE/KWin, [kdotool](https://github.com/jinliu/kdotool) is installed 
 	   <br/>--- can be installed via `cargo install kdotool`, 
 	   if cargo and rust is installed; rust and cargo you can install via your Linux
  	   package manager.
+	   -->
 2. For ⧉ **arranging desktop windows** from within emacs, add to your `init.el`
    (with [MELPA](https://www.melpa.org/) already configured; 
    see [example init.el](etc/example-emacs-inits/01-dwin-via-package/init.el)):
@@ -59,7 +63,7 @@ compositors.
    ```
 	Then with `M-x dwin-grab` you can grab any desktop window and resize and reposition it. 
 
-	For X11 also some irrelevant windows will be offered; see <a href="#limit:irrelevant-windows">Known Issues 2</a>.
+	For X11 also some irrelevant windows will be offered; see [Known Issues 2](#limit:irrelevant-windows).
 	There should be no such issue with KDE/KWin.
 
 3. For 🔀 **directional navigation**, add to `use-package`:
@@ -99,11 +103,10 @@ compositors.
    ```
    In your window manager's shortcut settings, e.g., 
    in ⚙️ KDE/System Settings/Shortcuts you have to add the shortcut key 
-   - `Ctrl-f11` to `etc/bin/dwin-emacs`, 
-   
-   Then with `<f11>` you can switch from emacs to firefox and 
-   with `C-<f11>`  you can switch back from firefox to emacs.
-
+   - `Ctrl-f11` to `etc/bin/dwin-emacs`.
+   Then with 
+   `M-x dwin-switch-to-app firefox` you can switch from emacs to firefox and with 
+   `C-<f11>`  you can switch back from firefox to emacs.
 
 ## <a id="usage">2. Further Usage 🚀</a>
 1. ⧉ **Arranging desktop windows** can do the following:
@@ -131,12 +134,12 @@ compositors.
    ```emacs-lisp
        :config
 	   (defun my/firefox (&optional prefix)
-		   (interactive "P")
+		   (interactive (list current-prefix-arg))
 		   (dwin-switch-to-app "firefox" prefix))
 	   (global-set-key (kbd "<f11>") #'my/firefox)
 
 	   (defun my/zotero (&optional prefix)
-		   (interactive "P")
+		   (interactive (list current-prefix-arg))
 		   (dwin-switch-to-app "zotero" prefix))
 	   (global-set-key (kbd "M-<f11>") #'my/zotero)
    ```
@@ -193,7 +196,7 @@ the window manager forwards some keys globally to emacs;
 for KDE one can bind a one-line script that uses emacsclient
 to forward the key to emacs, using `dwin-input-key` defined in code sect. 1.
 See `etc/bin/dwin-firefox` for an example. See 
-<a href="#why-not-ydotool">Further Details / 1</a>
+[Further Details / 1](#why-not-ydotool)
 for why we cannot use tools like [ydotool](https://github.com/ReimuNotMoe/ydotool) 
 for sending keys.
 
@@ -291,6 +294,39 @@ to resize them, reposition them etc.
 	The KDE/KWin Wayland proxy I am using myself daily, so it should be fairly 
 	well working most of the time. The generic X11 proxy I can only test occasionally
 	and it might have more bugs.
+
+4. <a id="limit:kdotool">A fixed version of kdotool is required.</a>
+- The official version 0.2.1 of [kdotool](https://github.com/jinliu/kdotool)
+  has several major bugs, for example, it cannot search for windows on a given
+  desktop. Unfortunately, currently its issue tracker is stale.
+- These bugs have been fixed in a [fork of kdotool](https://github.com/tvidal-net/kdotool),
+  but this fork cannot be installed via `cargo install` yet. Currently, you have to do this 
+  manually:
+  ```bash
+  git clone https://github.com/tvidal-net/kdotool.git
+  cd kdotool
+  cargo build --release
+  cp target/release/kdotool ~/.local/bin
+  ```
+    (if `~/.local/bin` is in your PATH.) 
+	To do so, cargo and rust have to be installed, usually via your Linux
+    package manager.
+
+5. <a id="limit:older-emacs">Running dwin on somewhat older Emacs.</a>
+- dwin runs on Emacs from 29.1 onwards seamlessly.
+- For Emacs 28.1 and 28.2 you need to add to your `use-package`
+  (see [example init.el with package](etc/example-emacs-inits/03-dwin-via-package-emacs-before-29.1/init.el)
+  and [example init.el with straight](etc/example-emacs-inits/04-dwin-via-straight-emacs-before-29.1/init.el)):
+   ```emacs-lisp
+   :init
+   (when (version< emacs-version "29.1")
+	   ;; for forward compatibility (see dwin-compat.el)
+	   (setf dwin-compat--set-transient-map-ORIG (symbol-function 'set-transient-map))
+	   (defalias 'keymap-set #'dwin-compat--keymap-set)
+	   (defalias 'set-transient-map #'dwin-compat--set-transient-map))
+   ```
+   Please note that this has to go to the `:init` section.
+- dwin does not run on Emacs 27 or older (see [dwin-compat.el](dwin-compat.el)).
 
 ### Further details:
 1. <a id="why-not-ydotool">Why cannot we just use ydotool to send keys to emacs?</a>
