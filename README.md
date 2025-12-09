@@ -75,10 +75,17 @@ compositors.
 	  (dwin-keymap-desktopglobal-set "M-<down>"  #'dwin-windmove-down)
 	```
 	Then with `M-<left>/<right>/<up>/<down>` you can move between Emacs
-	windows and between desktop windows seamlessly. --- For window managers / compositors
-	other than KDE/KWin you have to use your window managers mechanism to define shortcuts
-	manually once per key, see 
-	[Further Details/Key Bindings](etc/further-details.md#key-bindings).
+	windows and between desktop windows seamlessly. 
+	
+	For window managers / compositors other than KDE/KWin you have to disable
+	dwins automatic key setting via
+   ```emacs-lisp
+      :config
+      (setq dwin-automatically-sync-desktop-global-keys nil)
+   ```
+	and use your window 
+	managers mechanism to define shortcuts manually once per key, see 
+	[Further Details/Key Bindings](etc/further-details.md#key-bindings). 
 
 4. For basic 🏷️ **named navigation**, add to `use-package`:
    ```emacs-lisp
